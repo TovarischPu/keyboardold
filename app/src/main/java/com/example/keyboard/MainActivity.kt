@@ -4,6 +4,7 @@ package com.example.keyboard
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.runtime.setValue
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             MaterialTheme {
                 AppContent()
@@ -31,16 +33,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppContent() {
     val backdrop = rememberLayerBackdrop()
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .layerBackdrop(backdrop)
             .background(Color(0xFF121212))
+            .layerBackdrop(backdrop)
     ) {
-        // Ваш главный экран
-        MainScreen(
 
-        )
+        Navigation1()
     }
 }

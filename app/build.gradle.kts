@@ -53,6 +53,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation(libs.androidx.navigation.compose)
     lintChecks("com.slack.lint.compose:compose-lint-checks:1.4.2")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

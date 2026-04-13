@@ -87,7 +87,7 @@ fun Navigation1() {
                 Box(
                     Modifier
                         .size(28f.dp)
-                        .paint(painterResource(com.example.keyboard.R.drawable.translator), colorFilter = iconColorFilter)
+                        .paint(painterResource(com.example.keyboard.R.drawable.settings3), colorFilter = iconColorFilter)
                 )
             }
 
@@ -98,7 +98,7 @@ fun Navigation1() {
                 Box(
                     Modifier
                         .size(28f.dp)
-                        .paint(painterResource(com.example.keyboard.R.drawable.translator), colorFilter = iconColorFilter)
+                        .paint(painterResource(com.example.keyboard.R.drawable.settings4), colorFilter = iconColorFilter)
                 )
             }
         }

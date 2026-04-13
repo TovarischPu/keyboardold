@@ -39,7 +39,7 @@ import com.example.keyboard.LiquidButton
 @Composable
 fun BackdropDemoScaffold(
     modifier: Modifier = Modifier,
-    @DrawableRes initialPainterResId: Int = R.drawable.wallpaper_light,
+    @DrawableRes initialPainterResId: Int = R.drawable.beije,
     content: @Composable BoxScope.(backdrop: LayerBackdrop) -> Unit
 ) {
     Box(

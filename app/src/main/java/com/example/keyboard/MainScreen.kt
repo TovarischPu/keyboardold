@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
@@ -21,8 +22,10 @@ import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults.contentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -39,12 +42,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
+import androidx.compose.ui.zIndex
 import com.example.keyboard.BackdropDemoScaffold
 import com.example.keyboard.LiquidButton
 import com.example.keyboard.LiquidToggle1
@@ -65,23 +73,29 @@ fun MainScreen() {
         ) {
             item {
                 Spacer(Modifier.windowInsetsTopHeight(WindowInsets.systemBars))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(text="Переводчикъ", fontSize = 30.sp,fontWeight = FontWeight.Bold)
+                }
             }
 
             item {
                 var text by remember {mutableStateOf("")}
                 var selected by rememberSaveable { mutableStateOf(false) }
-                Spacer(modifier = Modifier.height(120.dp).fillMaxWidth())
+                var i by remember { mutableStateOf(2) }
+                val screenWidthDp = LocalConfiguration.current.screenWidthDp
+                val screenHeightDp = LocalConfiguration.current.screenHeightDp
+                var text2 by remember {mutableStateOf("")}
+                val context = LocalContext.current
+                Spacer(modifier = Modifier.height(screenHeightDp*0.13f.dp).fillMaxWidth())
                 Box(modifier = Modifier.fillMaxWidth().padding(start = 25.dp),
-                   // contentAlignment = Alignment.CenterEnd,
                     ){
                     Row(
                         modifier = Modifier
                             .fillMaxSize(),
-
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ){
-                        Text("Нейросѣтевой переводъ", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                        Text("Нейросѣтевой переводъ", fontSize = 18.sp)
                         LiquidToggle1(selected = { selected },
                             onSelect = { selected = it },
                             backdrop = backdrop,
@@ -100,24 +114,32 @@ fun MainScreen() {
                                 lens(16f.dp.toPx(), 32f.dp.toPx())
                             }
                         )
-                        .height(160f.dp)
+                        .height(screenHeightDp*0.18f.dp)
+                        .padding(start = 20.dp)
                         .fillMaxWidth()
                 ){
-                    Icon(painter = painterResource(com.example.keyboard.R.drawable.translator),
-                        contentDescription = "Флаг_новый",
-                        modifier = Modifier.size(24.dp))
-                    OutlinedTextField(
+                    Column(modifier = Modifier){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth().padding(start = 0.dp, end=20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("")
+                        Text("Е", fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    }
+                        //Spacer(modifier = Modifier.height(20.dp))
+
+                    BasicTextField(
                         value = text,
                         onValueChange = { text = it },
-                        modifier = Modifier.padding(16.dp).height(160f.dp).fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
+                        modifier = Modifier.fillMaxWidth()
+                            .zIndex(0f),
+                        textStyle = LocalTextStyle.current.copy(color = Color.Transparent, fontSize = 22.sp),
+                        cursorBrush = SolidColor(Color.Transparent),
                         )
-                    )
+                        AnimatedText(text = text,-28)
+                }
                 }
                 Spacer(modifier = Modifier.height(16.dp).fillMaxWidth())
                 Row(
@@ -131,7 +153,6 @@ fun MainScreen() {
                     LiquidButton(
                         {},
                         backdrop,
-
                         ) {
                         Icon(painter = painterResource(com.example.keyboard.R.drawable.strelki),
                             contentDescription = "Иконка",
@@ -149,36 +170,50 @@ fun MainScreen() {
                                 lens(16f.dp.toPx(), 32f.dp.toPx())
                             }
                         )
-                        .height(160f.dp)
+                        .height(screenHeightDp*0.18f.dp)
                         .fillMaxWidth()
                 ){
-                    Icon(painter = painterResource(com.example.keyboard.R.drawable.old_flag),
-                        contentDescription = "Флаг_старый",
-                        modifier = Modifier.size(24.dp))
-                    OutlinedTextField(
-                        value = text,
-                        onValueChange = { text = it },
-                        modifier = Modifier.padding(16.dp).height(160f.dp).fillMaxWidth(),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        readOnly = true
-                    )
+                    Column(modifier = Modifier.padding(start = 20.dp)) {
+                        Row(
+                        modifier = Modifier
+                            .fillMaxWidth().padding(end=20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("")
+                        Text("Ѣ",fontSize = 18.sp,fontWeight = FontWeight.Bold)
+                    }
+                        AnimatedText(text = text,0) }
                 }
                 Spacer(modifier = Modifier.height(16.dp).fillMaxWidth())
                 LiquidButton(
-                    {},
+                    {
+                        //text2=Translatoric(context,text).orEmpty()
+                    },
                     backdrop
                 ) {
                     BasicText(
-                        "Перевести...",
-                        style = TextStyle(Color.Black, 15f.sp, fontWeight = FontWeight.Bold)
+                        "Перевести",
+                        style = TextStyle(Color.Black, 15f.sp)
                 )
             }
+                Spacer(modifier = Modifier.height(screenHeightDp*0.07f.dp).fillMaxWidth())
+                Box(
+                    Modifier
+                        .drawBackdrop(
+                            backdrop = backdrop,
+                            shape = { RoundedRectangle(32f.dp) },
+                            effects = {
+                                vibrancy()
+                                lens(16f.dp.toPx(), 32f.dp.toPx())
+                            }
+                        )
+                        .height((160f)*i.dp)
+                        .fillMaxWidth()
+                ){
+
+                }
+                Spacer(modifier = Modifier.height(screenHeightDp*0.04f.dp).fillMaxWidth())
             }
             item {
                 Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))

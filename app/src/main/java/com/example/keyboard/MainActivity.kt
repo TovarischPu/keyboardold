@@ -32,14 +32,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppContent() {
-    val backdrop = rememberLayerBackdrop()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF121212))
-            .layerBackdrop(backdrop)
-    ) {
+//    val backdrop = rememberLayerBackdrop()
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color(0xFF121212))
+//            .layerBackdrop(backdrop)
+//    ) {
 
         Navigation1()
-    }
+    //}
 }

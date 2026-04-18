@@ -27,6 +27,7 @@ fun RowScope.LiquidBottomTab(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val scale = LocalLiquidBottomTabScale.current
+
     Column(
         modifier
             .clip(Capsule())

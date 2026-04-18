@@ -243,7 +243,7 @@ fun LiquidBottomTabs(
                 .graphicsLayer {
                     translationX =
                         if (isLtr) dampedDragAnimation.value * tabWidth + panelOffset
-                        else size.width - (dampedDragAnimation.value + 1f) * tabWidth + panelOffset
+                        else size.width - (dampedDragAnimation.value + 0f) * tabWidth + panelOffset
                 }
                 .then(interactiveHighlight.gestureModifier)
                 .then(dampedDragAnimation.modifier)
@@ -253,8 +253,8 @@ fun LiquidBottomTabs(
                     effects = {
                         val progress = dampedDragAnimation.pressProgress
                         lens(
-                            10f.dp.toPx() * progress,
-                            14f.dp.toPx() * progress,
+                            20f.dp.toPx() * progress,
+                            24f.dp.toPx() * progress,
                             chromaticAberration = true
                         )
                     },

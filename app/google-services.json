@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "549441911801",
+    "project_id": "keyboard-63454",
+    "storage_bucket": "keyboard-63454.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:549441911801:android:1e7b65bb2e19c9d8131b28",
+        "android_client_info": {
+          "package_name": "com.example.keyboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "549441911801-1lsm2uljetar7c6ev177p7s4fhvbklh1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.keyboard",
+            "certificate_hash": "02584dba932869d5654940859e3919f3d3e6bb39"
+          }
+        },
+        {
+          "client_id": "549441911801-sk5b96hie2r8qbg99j464q6i2gqnfcd4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAY4a5Ze8HyCPVWCUw7PVT6FVJO86oNpQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "549441911801-sk5b96hie2r8qbg99j464q6i2gqnfcd4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

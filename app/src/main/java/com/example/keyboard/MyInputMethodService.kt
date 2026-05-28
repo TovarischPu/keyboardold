@@ -26,6 +26,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.example.keyboard.translator.GptClient
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -161,7 +163,12 @@ class MyInputMethodService : InputMethodService() {
                 cornerRadius = 16f
                 setColor(Color.parseColor("#E0E0E0"))
             }
-            setOnClickListener { if (!isTranslating) startTranslation() }
+            setOnClickListener {
+                if(Firebase.auth.currentUser == null){
+                    Toast.makeText(this@MyInputMethodService, "Войдите в аккаунт!", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                if (!isTranslating) startTranslation() }
         }
 
         globeButton = ImageButton(this).apply {

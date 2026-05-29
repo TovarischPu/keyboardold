@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "549441911801-ctl6ludca33pnumj9qqav48boki7fjam.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.keyboard",
+            "certificate_hash": "ba2e231f4fa11bdf2c3fd627c6d55bb76e5298cc"
+          }
+        },
+        {
           "client_id": "549441911801-sk5b96hie2r8qbg99j464q6i2gqnfcd4.apps.googleusercontent.com",
           "client_type": 3
         }

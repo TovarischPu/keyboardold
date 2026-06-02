@@ -45,6 +45,7 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.ui:ui")
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.android.gms:play-services-auth:21.0.0")

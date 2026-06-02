@@ -1,7 +1,6 @@
 package com.example.keyboard.design
 
 import androidx.compose.animation.AnimatedVisibility
-
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -20,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -29,10 +29,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+
 @Suppress("UnusedBoxWithConstraintsScope")
 @Composable
 fun AnimatedMultiLineText(
     text: String,
+    cursorIndex: Int,
+    onCursorIndexChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 22.sp,
     cursorColor: Color = Color.Black,
@@ -58,21 +61,44 @@ fun AnimatedMultiLineText(
                 softWrap = true
             )
         }
+
         val cursorPosition = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
         val scope = rememberCoroutineScope()
 
-        LaunchedEffect(layoutResult, text.length) {
-            val cursorRect = layoutResult.getCursorRect(text.length)
+        LaunchedEffect(layoutResult, cursorIndex) {
+            val safeIndex = cursorIndex.coerceIn(0, text.length)
+            val cursorRect = layoutResult.getCursorRect(safeIndex)
             scope.launch {
                 cursorPosition.animateTo(
                     targetValue = Offset(cursorRect.left, cursorRect.top),
-                    animationSpec = spring(stiffness = Spring.StiffnessLow, dampingRatio = Spring.DampingRatioNoBouncy)
+                    animationSpec = spring(
+                        stiffness = Spring.StiffnessLow,
+                        dampingRatio = Spring.DampingRatioNoBouncy
+                    )
                 )
             }
         }
 
-
-        Box(modifier = Modifier.fillMaxWidth().offset(y=y.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(y = y.dp)
+                .pointerInput(layoutResult) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            event.changes.forEach { pointerChange ->
+                                if (pointerChange.pressed) {
+                                    val offset = pointerChange.position
+                                    val clickedIndex = layoutResult.getOffsetForPosition(offset)
+                                    onCursorIndexChange(clickedIndex)
+                                    pointerChange.consume()
+                                }
+                            }
+                        }
+                    }
+                }
+        ) {
             BlinkingCursor(
                 modifier = Modifier.offset(
                     x = with(density) { cursorPosition.value.x.toDp() },
@@ -80,8 +106,9 @@ fun AnimatedMultiLineText(
                 ),
                 color = cursorColor,
                 height = with(density) { fontSize.toDp() },
-                m=m
+                m = m
             )
+
             text.forEachIndexed { index, char ->
                 val bounds: Rect = layoutResult.getBoundingBox(index)
                 key(index) {
@@ -91,16 +118,13 @@ fun AnimatedMultiLineText(
                             y = with(density) { bounds.top.toDp() }
                         )
                     ) {
-
                         AnimatedLetter(char, fontSize)
                     }
                 }
-
             }
         }
     }
 }
-
 @Composable
 fun AnimatedLetter(
     char: Char,

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
@@ -122,6 +124,10 @@ fun MainScreen(user: FirebaseUser?,viewModel: TranslatorViewModel = viewModel(),
                     val screenHeightDp = LocalConfiguration.current.screenHeightDp
                     val text2 by viewModel.translatedText.collectAsState()
                     var selected1 by rememberSaveable { mutableStateOf(true) }
+                    var textFieldValue by remember {
+                        mutableStateOf(TextFieldValue(""))
+                    }
+
                     LaunchedEffect(selected) {
                         if (selected && user == null) {
                             isCorrect=false
@@ -194,8 +200,8 @@ fun MainScreen(user: FirebaseUser?,viewModel: TranslatorViewModel = viewModel(),
                                 )
                             }
                             BasicTextField(
-                                value = text,
-                                onValueChange = { text = it },
+                                value = textFieldValue,
+                                onValueChange = { textFieldValue = it },
                                 modifier = Modifier.fillMaxWidth()
                                     .zIndex(0f).height(22.dp),
                                 textStyle = LocalTextStyle.current.copy(
@@ -205,8 +211,19 @@ fun MainScreen(user: FirebaseUser?,viewModel: TranslatorViewModel = viewModel(),
                                 cursorBrush = SolidColor(Color.Transparent),
                             )
                             AnimatedMultiLineText(
-                                text = text,
-                                modifier = Modifier.fillMaxWidth().zIndex(1f)
+                                text = textFieldValue.text,
+                                cursorIndex = textFieldValue.selection.start,
+                                onCursorIndexChange = { newIndex ->
+                                    textFieldValue = TextFieldValue(
+                                        text = textFieldValue.text,
+                                        selection = androidx.compose.ui.text.TextRange(newIndex)
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 100.dp),
+                                fontSize = 22.sp,
+                                cursorColor = Color.Black
                             )
                         }
                     }
@@ -267,9 +284,20 @@ fun MainScreen(user: FirebaseUser?,viewModel: TranslatorViewModel = viewModel(),
                             }
                             AnimatedMultiLineText(
                                 text = text1,
-                                modifier = Modifier.fillMaxWidth().zIndex(1f),
-                                y = 0,
-                                m = 0f
+                                cursorIndex = textFieldValue.selection.start,
+                                onCursorIndexChange = { newIndex ->
+                                    textFieldValue = TextFieldValue(
+                                        text = textFieldValue.text,
+                                        selection = androidx.compose.ui.text.TextRange(newIndex)
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 100.dp),
+                                fontSize = 22.sp,
+                                cursorColor = Color.Black,
+                                y=0,
+                                m=0f
                             )
                         }
                     }
@@ -278,9 +306,9 @@ fun MainScreen(user: FirebaseUser?,viewModel: TranslatorViewModel = viewModel(),
                         {
                             if (!selected) {
                                 text1 = ""
-                                viewModel.translate(text)
+                                viewModel.translate(textFieldValue.text)
                             } else {
-                                viewModel1.sendMessage(text)
+                                viewModel1.sendMessage(textFieldValue.text)
                                 uiState.response?.let { resp ->
                                     text1 = resp
                                 }

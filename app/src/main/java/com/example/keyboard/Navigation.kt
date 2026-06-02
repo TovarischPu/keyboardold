@@ -37,7 +37,7 @@ import com.kyant.backdrop.backdrops.LayerBackdrop
 import com.kyant.backdrop.backdrops.layerBackdrop
 
 @Composable
-fun Navigation1(backdrop: LayerBackdrop, user: FirebaseUser?,
+fun Navigation(backdrop: LayerBackdrop, user: FirebaseUser?,
                 onSignIn: () -> Unit,
                 onSignOut: () -> Unit) {
     val iconColorFilter = ColorFilter.tint(contentColor)

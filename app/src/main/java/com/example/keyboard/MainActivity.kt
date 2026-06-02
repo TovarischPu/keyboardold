@@ -94,6 +94,6 @@ fun AppContent(
     onSignOut: () -> Unit
 ) {
     BackdropDemoScaffold { backdrop ->
-        Navigation1(backdrop = backdrop, user = user, onSignIn = onSignIn, onSignOut = onSignOut)
+        Navigation(backdrop = backdrop, user = user, onSignIn = onSignIn, onSignOut = onSignOut)
     }
 }

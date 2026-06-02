@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -27,8 +28,12 @@ import com.kyant.backdrop.effects.vibrancy
 import com.kyant.backdrop.shadow.Shadow
 import com.kyant.shapes.RoundedRectangle
 
+
 @Composable
 fun Course1Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Backdrop,test: (Boolean)-> Unit,text1: (String)-> Unit) {
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
     when (step) {
         0 -> StepTemplate(title = "Курс 1: Теория 1", onNext = onNext, onBack = onBack) {
             test(false)
@@ -42,7 +47,7 @@ fun Course1Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Back
         }
         2 -> StepTemplate(title = "Курс 2: Тест", onNext = onNext, onBack = onBack, isFinish = true) {
             Text("Переведи: Мефодий", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            var text by remember { mutableStateOf("") }
+
             test(true)
             Box(
                 Modifier
@@ -63,8 +68,8 @@ fun Course1Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Back
                     .fillMaxWidth()
             ) {
                 BasicTextField(
-                    value = text,
-                    onValueChange = { text = it },
+                    value = textFieldValue,
+                    onValueChange = { textFieldValue = it },
                     modifier = Modifier.fillMaxWidth()
                         .zIndex(0f).height(30.dp),
                     textStyle = LocalTextStyle.current.copy(
@@ -74,12 +79,19 @@ fun Course1Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Back
                     cursorBrush = SolidColor(Color.Transparent),
                 )
                 AnimatedMultiLineText(
-                    text = text,
+                    text = textFieldValue.text,
+                    cursorIndex = textFieldValue.selection.start,
+                    onCursorIndexChange = { newIndex ->
+                        textFieldValue = TextFieldValue(
+                            text = textFieldValue.text,
+                            selection = androidx.compose.ui.text.TextRange(newIndex)
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth().zIndex(1f),
                     y = 5
                 )
             }
-            text1(text)
+            text1(textFieldValue.text)
         }
         3 -> StepTemplate(title = "Курс 1: Ижица", onNext = onNext, onBack = onBack, isFinish = true) {
             test(false)
@@ -95,6 +107,9 @@ fun Course1Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Back
 
 @Composable
 fun Course2Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Backdrop,test: (Boolean)-> Unit,text1: (String)-> Unit) {
+    var textFieldValue by remember {
+        mutableStateOf(TextFieldValue(""))
+    }
     when (step) {
         0 -> StepTemplate(title = "Курс 2: Теория 1", onNext = onNext, onBack = onBack) {
             Text("Перейдёмъ к болѣе сложнымъ буквамъ: Ѳ и Ѣ. ", fontSize = 18.sp)
@@ -108,7 +123,7 @@ fun Course2Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Back
         }
         2 -> StepTemplate(title = "Курс 1: Тест", onNext = onNext, onBack = onBack, isFinish = true) {
             Text("Переведи: амбиция", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            var text by remember { mutableStateOf("") }
+
             test(true)
             Box(
                 Modifier
@@ -125,8 +140,8 @@ fun Course2Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Back
                     .fillMaxWidth()
             ) {
                 BasicTextField(
-                    value = text,
-                    onValueChange = { text = it },
+                    value = textFieldValue,
+                    onValueChange = { textFieldValue = it },
                     modifier = Modifier.fillMaxWidth()
                         .zIndex(0f).height(30.dp),
                     textStyle = LocalTextStyle.current.copy(
@@ -136,12 +151,19 @@ fun Course2Step(step: Int, onNext: () -> Unit, onBack: () -> Unit,backdrop: Back
                     cursorBrush = SolidColor(Color.Transparent),
                 )
                 AnimatedMultiLineText(
-                    text = text,
+                    text = textFieldValue.text,
+                    cursorIndex = textFieldValue.selection.start,
+                    onCursorIndexChange = { newIndex ->
+                        textFieldValue = TextFieldValue(
+                            text = textFieldValue.text,
+                            selection = androidx.compose.ui.text.TextRange(newIndex)
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth().zIndex(1f),
                     y = 5
                 )
             }
-            text1(text)
+            text1(textFieldValue.text)
         }
         3 -> StepTemplate(title = "Курс 2: Финал", onNext = onNext, onBack = onBack, isFinish = true) {
             Text("🎉 Курс 2 завершён!", fontSize = 20.sp, fontWeight = FontWeight.Bold)

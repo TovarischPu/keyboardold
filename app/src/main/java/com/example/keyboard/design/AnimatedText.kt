@@ -1,11 +1,6 @@
 package com.example.keyboard.design
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -16,9 +11,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -28,7 +25,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private data class CharItem(
+    val id: Int,
+    val char: Char,
+    var index: Int,
+    var visible: Boolean,
+    var cachedBounds: Rect = Rect.Zero
+)
 
 @Suppress("UnusedBoxWithConstraintsScope")
 @Composable
@@ -79,6 +86,29 @@ fun AnimatedMultiLineText(
             }
         }
 
+        var charItems by remember { mutableStateOf<List<CharItem>>(emptyList()) }
+        var nextId by remember { mutableIntStateOf(0) }
+
+        LaunchedEffect(text) {
+            val currentItems = charItems.toMutableList()
+            val newItems = mutableListOf<CharItem>()
+
+            text.forEachIndexed { index, char ->
+                val existing = currentItems.find { it.char == char && it.visible && it.index == index }
+                if (existing != null) {
+                    existing.index = index
+                    newItems.add(existing)
+                } else {
+                    newItems.add(CharItem(id = nextId++, char = char, index = index, visible = true))
+                }
+            }
+
+            val removedItems = currentItems.filterNot { newItems.contains(it) }
+                .map { it.copy(visible = false) }
+
+            charItems = newItems + removedItems
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -99,6 +129,7 @@ fun AnimatedMultiLineText(
                     }
                 }
         ) {
+            // Курсор
             BlinkingCursor(
                 modifier = Modifier.offset(
                     x = with(density) { cursorPosition.value.x.toDp() },
@@ -109,47 +140,80 @@ fun AnimatedMultiLineText(
                 m = m
             )
 
-            text.forEachIndexed { index, char ->
-                val bounds: Rect = layoutResult.getBoundingBox(index)
-                key(index) {
-                    Box(
+
+            charItems.forEach { item ->
+                if (item.visible && item.index < layoutResult.layoutInput.text.length) {
+                    item.cachedBounds = layoutResult.getBoundingBox(item.index)
+                }
+
+                key(item.id) {
+                    AnimatedLetter(
+                        char = item.char,
+                        fontSize = fontSize,
+                        visible = item.visible,
+                        onExitFinished = {
+                            charItems = charItems.filter { it.id != item.id }
+                        },
                         modifier = Modifier.offset(
-                            x = with(density) { bounds.left.toDp() },
-                            y = with(density) { bounds.top.toDp() }
+                            x = with(density) { item.cachedBounds.left.toDp() },
+                            y = with(density) { item.cachedBounds.top.toDp() }
                         )
-                    ) {
-                        AnimatedLetter(char, fontSize)
-                    }
+                    )
                 }
             }
         }
     }
 }
+
 @Composable
 fun AnimatedLetter(
     char: Char,
     fontSize: TextUnit,
+    visible: Boolean,
+    onExitFinished: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var visible by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
+    val distancePx = with(density) { 10.dp.toPx() }
 
-    LaunchedEffect(Unit) {
-        visible = true
+    val alpha = remember { Animatable(0f) }
+    val offsetX = remember { Animatable(distancePx) }
+    val offsetY = remember { Animatable(-distancePx) }
+    val blurRadius = remember { Animatable(20f) }
+
+    LaunchedEffect(visible) {
+        if (visible) {
+            coroutineScope {
+                launch { alpha.animateTo(1f, tween(350, easing = FastOutSlowInEasing)) }
+                launch { offsetX.animateTo(0f, tween(350, easing = FastOutSlowInEasing)) }
+                launch { offsetY.animateTo(0f, tween(350, easing = FastOutSlowInEasing)) }
+                launch { blurRadius.animateTo(0f, tween(350, easing = FastOutSlowInEasing)) }
+            }
+        } else {
+            coroutineScope {
+                launch { alpha.animateTo(0f, tween(350, easing = FastOutSlowInEasing)) }
+                launch { offsetX.animateTo(-distancePx, tween(350, easing = FastOutSlowInEasing)) }
+                launch { offsetY.animateTo(-distancePx, tween(350, easing = FastOutSlowInEasing)) }
+                launch { blurRadius.animateTo(25f, tween(350, easing = FastOutSlowInEasing)) }
+            }
+            delay(350)
+            onExitFinished()
+        }
     }
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(animationSpec = tween(1000, easing = LinearOutSlowInEasing)) +
-                slideInVertically(initialOffsetY = { -it / 3 }, animationSpec = tween(500, easing = FastOutSlowInEasing)),
-        exit = fadeOut(animationSpec = tween(100, easing = FastOutSlowInEasing)) +
-                slideOutVertically(targetOffsetY = { it / 3 }, animationSpec = tween(150, easing = FastOutSlowInEasing))
-    ) {
-        Text(
-            text = char.toString(),
-            fontSize = fontSize,
-            lineHeight = fontSize * 1.2f,
-            modifier = modifier
-        )
-    }
+    val blurDp = with(density) { blurRadius.value.toDp() }
+
+    Text(
+        text = char.toString(),
+        fontSize = fontSize,
+        lineHeight = fontSize * 1.2f,
+        modifier = modifier
+            .graphicsLayer {
+                this.alpha = alpha.value
+                this.translationX = offsetX.value
+                this.translationY = offsetY.value
+            }
+            .blur(blurDp)
+    )
 }
 
 @Composable
